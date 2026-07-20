@@ -1,0 +1,78 @@
+:root {
+  /* Base tokens (defaults) */
+  --ink-950: #0B0C10;
+  --ink-900: #15171C;
+  --ink-800: #1C1E24;
+  --line-700: #262932;
+  --paper-100: #F5F5F2;
+  --paper-400: #9A9CA6;
+  
+  --signal-gold: #F0A93E;
+  --signal-gold-soft: rgba(240, 169, 62, 0.14);
+  --pitch-teal: #2FA6A0;
+  --positive: #22C55E;
+  --negative: #EF4444;
+  --neutral-delta: #6B7280;
+  
+  --theme-bg-image: none;
+
+  --font-display: 'Archivo', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+}
+
+/* Theme A: Vibrant Turf */
+body.theme-a {
+  --ink-950: #0a1128;
+  --ink-900: #132042;
+  --ink-800: #1b2f5c;
+  --line-700: #2a4175;
+  --signal-gold: #FFD700;
+  --signal-gold-soft: rgba(255, 215, 0, 0.14);
+  --positive: #22C55E;
+  --theme-bg-image: url('../img/themes/theme-a.jpg');
+}
+
+/* Theme B: Premium Neon */
+body.theme-b {
+  --ink-950: #0B0A1A;
+  --ink-900: #15132D;
+  --ink-800: #23204A;
+  --line-700: #34306B;
+  --signal-gold: #7B61FF;
+  --signal-gold-soft: rgba(123, 97, 255, 0.14);
+  --positive: #00F0FF;
+  --theme-bg-image: url('../img/themes/theme-b.jpg');
+}
+
+/* Theme C: Electric Pop */
+body.theme-c {
+  --ink-950: #1F0529;
+  --ink-900: #330A42;
+  --ink-800: #4B125E;
+  --line-700: #651D7C;
+  --signal-gold: #FF007F;
+  --signal-gold-soft: rgba(255, 0, 127, 0.14);
+  --positive: #00E5FF;
+  --theme-bg-image: url('../img/themes/theme-c.jpg');
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

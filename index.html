@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>PlusOne Analytics</title>
+  <meta name="description" content="Football match, team, player, odds, and prediction analytics." data-label-placeholder="app.tagline" />
+  <meta name="theme-color" content="#0B0C10" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="assets/css/fonts.css" />
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <div id="splash" class="splash">
+    <div class="splash__mark">+1</div>
+    <p>Loading PlusOne Analytics&hellip;</p>
+  </div>
+
+  <div id="app-shell" class="app-shell">
+    <header class="app-header">
+      <a class="app-header__brand" href="#/">
+        <span class="app-header__mark">+1</span>
+        <span class="app-header__name" data-label="app.name">PlusOne Analytics</span>
+      </a>
+
+      <nav class="app-header__nav">
+        <a href="#/" data-nav="/" data-label="nav.today">Today</a>
+        <a href="#/matches" data-nav="/matches" data-label="nav.matches">Matches</a>
+        <a href="#/teams" data-nav="/teams" data-label="nav.teams">Teams</a>
+        <a href="#/players" data-nav="/players" data-label="nav.players">Players</a>
+        <a href="#/leagues" data-nav="/leagues" data-label="nav.leagues">Leagues</a>
+        <a href="#/predictions" data-nav="/predictions" data-label="nav.predictions">Predictions</a>
+        <a href="#/value-bets" data-nav="/value-bets" data-label="nav.valuebets">Value Bets</a>
+        
+        <div class="nav-dropdown">
+          <span class="nav-dropdown__btn" data-label="nav.explore">Explore ▾</span>
+          <div class="nav-dropdown__content">
+            <a href="#/injuries" data-nav="/injuries" data-label="nav.injuries">Injuries</a>
+            <a href="#/model-performance" data-nav="/model-performance" data-label="nav.performance">Performance</a>
+            <a href="#/how-it-works" data-nav="/how-it-works" data-label="nav.howitworks">How It Works</a>
+          </div>
+        </div>
+        
+        <a href="#/admin" data-nav="/admin" id="nav-admin-link" style="display:none;color:var(--signal-gold)">&#9881; Admin</a>
+        <a href="#/login" data-nav="/login" id="nav-login-link">Sign In</a>
+        <button id="nav-settings-btn" class="nav-icon-btn" aria-label="Settings" title="User Settings">
+          <i data-lucide="settings"></i>
+        </button>
+      </nav>
+
+      <div class="app-header__status">
+        <span id="db-status" class="db-status">No database loaded</span>
+        <span id="nav-user-badge" class="nav-user-badge" style="display:none" title=""></span>
+        <label class="app-header__import" title="Import a .sqlite backup">
+          <input type="file" id="db-file-input" accept=".sqlite,.db" hidden />
+          <span>Import DB</span>
+        </label>
+      </div>
+    </header>
+
+    <main id="app-outlet" class="app-outlet" aria-live="polite"></main>
+
+    <footer class="app-footer">
+      <p><span data-label="app.footer">Informational analytics only &mdash; not betting advice.</span> <a href="#/how-it-works" data-label="nav.howitworks">How It Works</a> &middot; <a href="#/injuries" data-label="nav.injuries">Injuries</a> &middot; <a href="#/terms">Terms</a> &middot; <a href="#/privacy">Privacy</a></p>
+    </footer>
+
+    <nav class="bottom-nav" id="bottom-nav">
+      <a href="#/" data-nav="/" class="bottom-nav__item">
+        <i data-lucide="calendar"></i>
+        <span data-label="nav.today">Today</span>
+      </a>
+      <a href="#/matches" data-nav="/matches" class="bottom-nav__item">
+        <i data-lucide="calendar-days"></i>
+        <span data-label="nav.matches">Matches</span>
+      </a>
+      <a href="#/teams" data-nav="/teams" class="bottom-nav__item">
+        <i data-lucide="shield"></i>
+        <span data-label="nav.teams">Teams</span>
+      </a>
+      <a href="#/players" data-nav="/players" class="bottom-nav__item">
+        <i data-lucide="users"></i>
+        <span data-label="nav.players">Players</span>
+      </a>
+      <a href="#/leagues" data-nav="/leagues" class="bottom-nav__item">
+        <i data-lucide="trophy"></i>
+        <span data-label="nav.leagues">Leagues</span>
+      </a>
+      <a href="#/predictions" data-nav="/predictions" class="bottom-nav__item">
+        <i data-lucide="bar-chart-2"></i>
+        <span data-label="nav.predictions">Odds</span>
+      </a>
+      <a href="#/value-bets" data-nav="/value-bets" class="bottom-nav__item">
+        <i data-lucide="target"></i>
+        <span data-label="nav.valuebets">Value</span>
+      </a>
+      <a href="#/injuries" data-nav="/injuries" class="bottom-nav__item">
+        <i data-lucide="heart-pulse"></i>
+        <span data-label="nav.injuries">Injuries</span>
+      </a>
+      <a href="#/model-performance" data-nav="/model-performance" class="bottom-nav__item">
+        <i data-lucide="trending-up"></i>
+        <span data-label="nav.performance">Performance</span>
+      </a>
+      <button id="bottom-nav-settings" class="bottom-nav__item">
+        <i data-lucide="settings"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <dialog id="user-settings-modal" class="modal">
+    <div class="modal__content">
+      <button class="modal__close" id="user-settings-close" aria-label="Close">&times;</button>
+      <h2>Preferences</h2>
+      <div class="settings-group">
+        <label for="settings-theme">App Theme</label>
+        <select id="settings-theme" class="form-select">
+          <option value="theme-a">Theme A (Vibrant Turf)</option>
+          <option value="theme-b">Theme B (Premium Neon)</option>
+          <option value="theme-c">Theme C (Electric Pop)</option>
+        </select>
+        <p class="settings-hint">Choose your preferred visual brand theme.</p>
+      </div>
+      <div class="settings-group" style="margin-top:16px;">
+        <label for="settings-bg-opacity">Background Opacity</label>
+        <div style="display:flex; align-items:center; gap: 8px;">
+          <input type="range" id="settings-bg-opacity" min="0" max="100" value="20" style="flex:1;">
+          <span id="settings-bg-opacity-val" style="width: 40px; font-size: 13px; font-family: var(--font-display); font-weight: 700; color: var(--signal-gold);">20%</span>
+        </div>
+        <p class="settings-hint">Adjust how visible the background image is.</p>
+      </div>
+      <div class="settings-group" style="margin-top:16px;">
+        <label for="settings-view-mode">Default Match View</label>
+        <select id="settings-view-mode" class="form-select">
+          <option value="cards">Card Grid (Visual)</option>
+          <option value="table">Table List (Compact)</option>
+        </select>
+        <p class="settings-hint">Choose how matches are displayed throughout the app.</p>
+      </div>
+      <div class="settings-group" style="margin-top:16px;">
+        <label for="settings-odds-format">Odds Format</label>
+        <select id="settings-odds-format" class="form-select">
+          <option value="decimal">Decimal (e.g., 1.95)</option>
+          <option value="fractional">Fractional (e.g., 19/20)</option>
+          <option value="american">American (e.g., -105)</option>
+        </select>
+        <p class="settings-hint">Choose your preferred odds notation.</p>
+      </div>
+      <div class="settings-group" style="margin-top:16px;">
+        <label for="settings-timezone">Timezone</label>
+        <select id="settings-timezone" class="form-select">
+          <option value="local">Local Time (Browser)</option>
+          <option value="utc">UTC</option>
+        </select>
+        <p class="settings-hint">Choose how match start times are displayed.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="assets/js/lib/lucide.min.js"></script>
+  <script src="database/sql-wasm.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
