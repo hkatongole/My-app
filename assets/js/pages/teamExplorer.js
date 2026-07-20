@@ -1,10 +1,11 @@
+import { db } from '../db/dbProvider.js';
 import { teamRepository  } from '../db/repositories.js';
 import { teamBadge, leagueBadge } from '../components/badges.js';
 import { formatPct } from '../components/format.js';
 import { storage } from '../db/storageAdapter.js';
 
 export async function renderTeamDirectory({ query }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

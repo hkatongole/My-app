@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { predictionRepository  } from '../db/repositories.js';
 import { teamBadge, leagueBadge } from '../components/badges.js';
 import { formatDate, todayISO, scoreline } from '../components/format.js';
@@ -7,7 +8,7 @@ import { storage } from '../db/storageAdapter.js';
 const TIERS = ['Low', 'Medium', 'High'];
 
 export async function renderValueBets({ query }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

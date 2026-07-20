@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { predictionRepository  } from '../db/repositories.js';
 import { oddsRepository  } from '../db/repositories.js';
 import { formatDate, formatPct } from '../components/format.js';
@@ -10,7 +11,7 @@ const TABS = [
 ];
 
 export async function renderPredictionOddsExplorer({ query }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

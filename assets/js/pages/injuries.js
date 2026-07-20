@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { storage } from '../db/storageAdapter.js';
 import { teamBadge } from '../components/badges.js';
 import { formatDateTime } from '../components/format.js';
@@ -10,7 +11,7 @@ import { formatDateTime } from '../components/format.js';
  * Only rendered when the table exists and has rows.
  */
 export async function renderInjuries({ query = {} } = {}) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

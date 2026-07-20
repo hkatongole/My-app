@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { leagueRepository  } from '../db/repositories.js';
 import { teamRepository  } from '../db/repositories.js';
 import { playerRepository  } from '../db/repositories.js';
@@ -50,7 +51,7 @@ async function seasonFromQuery(league, query) {
 }
 
 export async function renderLeagueOverview({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const ov = await leagueRepository.overview(league, season);
 
@@ -77,7 +78,7 @@ export async function renderLeagueOverview({ league, query }) {
 }
 
 export async function renderLeagueStandings({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const rows = await leagueRepository.standings(league, season);
   const seasons = await leagueRepository.seasonsFor(league);
@@ -120,7 +121,7 @@ export async function renderLeagueStandings({ league, query }) {
 }
 
 export async function renderLeagueFixtures({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const page = Number(query.page || 1);
   const { rows, total, totalPages } = await leagueRepository.fixturesPage(league, todayISO(), { page, pageSize: 20 });
@@ -151,7 +152,7 @@ export async function renderLeagueFixtures({ league, query }) {
 }
 
 export async function renderLeagueResults({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = query.season || await leagueRepository.latestSeason(league);
   const page = Number(query.page || 1);
   const seasons = await leagueRepository.seasonsFor(league);
@@ -193,7 +194,7 @@ export async function renderLeagueResults({ league, query }) {
 }
 
 export async function renderLeagueTeams({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const rows = await teamRepository.directory({ league, season });
 
@@ -220,7 +221,7 @@ export async function renderLeagueTeams({ league, query }) {
 }
 
 export async function renderLeaguePlayers({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const page = Number(query.page || 1);
   const { rows, total, totalPages } = await playerRepository.directory({ league, season, page, pageSize: 25 });
@@ -252,7 +253,7 @@ export async function renderLeaguePlayers({ league, query }) {
 }
 
 export async function renderLeagueStatistics({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const stats = await leagueRepository.statistics(league, season);
   const goalsPerMatch = stats.played ? (stats.total_goals / stats.played).toFixed(2) : null;
@@ -285,7 +286,7 @@ export async function renderLeagueStatistics({ league, query }) {
 }
 
 export async function renderLeaguePredictions({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const dist = await leagueRepository.predictionDistribution(league, season);
 
@@ -311,7 +312,7 @@ export async function renderLeaguePredictions({ league, query }) {
 }
 
 export async function renderLeagueOdds({ league, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const season = await seasonFromQuery(league, query);
   const page = Number(query.page || 1);
   const { rows, total, totalPages } = await leagueRepository.oddsPage(league, { page, pageSize: 20 });
@@ -344,7 +345,7 @@ export async function renderLeagueOdds({ league, query }) {
 }
 
 export async function renderLeagueSeasons({ league }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const seasons = await leagueRepository.seasonsFor(league);
 
   const body = `

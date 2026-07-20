@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { matchRepository  } from '../db/repositories.js';
 import { teamRepository  } from '../db/repositories.js';
 import { teamBadge, leagueBadge } from '../components/badges.js';
@@ -13,7 +14,7 @@ const TABS = [
 ];
 
 export async function renderMatchDetail({ id, query = {} }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2></div>`;
   }
   const bundle = await matchRepository.detailBundle(id);

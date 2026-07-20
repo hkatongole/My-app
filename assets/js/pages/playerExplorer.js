@@ -1,10 +1,11 @@
+import { db } from '../db/dbProvider.js';
 import { playerRepository  } from '../db/repositories.js';
 import { teamBadge, playerSilhouette } from '../components/badges.js';
 import { formatNationality } from '../components/format.js';
 import { storage } from '../db/storageAdapter.js';
 
 export async function renderPlayerDirectory({ query }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

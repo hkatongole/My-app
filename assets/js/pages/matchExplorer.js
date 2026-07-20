@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { matchRepository  } from '../db/repositories.js';
 import { teamBadge, leagueBadge } from '../components/badges.js';
 import { formatDate, scoreline } from '../components/format.js';
@@ -6,7 +7,7 @@ import { renderMatchesList } from '../components/matchList.js';
 import { userSettings } from '../components/userSettings.js';
 
 export async function renderMatchList({ query }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

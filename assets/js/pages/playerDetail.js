@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { playerRepository  } from '../db/repositories.js';
 import { teamBadge, leagueBadge, playerSilhouette } from '../components/badges.js';
 import { formatNationality } from '../components/format.js';
@@ -48,7 +49,7 @@ function shell(player, activeTab, current, body) {
 }
 
 export async function renderPlayerOverview({ player }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const current = await playerRepository.latestRowFor(player);
   if (!current) {
     return shell(player, 'overview', null, `<div class="empty-state"><p>No records on file for this player.</p></div>`);
@@ -76,7 +77,7 @@ export async function renderPlayerOverview({ player }) {
 }
 
 export async function renderPlayerStatistics({ player }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const current = await playerRepository.latestRowFor(player);
   if (!current) {
     return shell(player, 'statistics', null, `<div class="empty-state"><p>No records on file for this player.</p></div>`);
@@ -103,7 +104,7 @@ export async function renderPlayerStatistics({ player }) {
 }
 
 export async function renderPlayerMatches({ player }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const current = await playerRepository.latestRowFor(player);
   const { available } = await playerRepository.matchAppearances(player);
 
@@ -121,7 +122,7 @@ export async function renderPlayerMatches({ player }) {
 }
 
 export async function renderPlayerSeasons({ player }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const rows = await playerRepository.profileRows(player);
   const current = rows[0] || null;
 
@@ -151,7 +152,7 @@ export async function renderPlayerSeasons({ player }) {
 }
 
 export async function renderPlayerTeams({ player }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const rows = await playerRepository.profileRows(player);
   const current = rows[0] || null;
 

@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { teamRepository  } from '../db/repositories.js';
 import { teamBadge, leagueBadge } from '../components/badges.js';
 import { formatPct, formatDate, scoreline, todayISO, formatNationality } from '../components/format.js';
@@ -46,7 +47,7 @@ function shell(team, activeTab, latestStats, body) {
 }
 
 export async function renderTeamOverview({ team }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const stats = await teamRepository.statsFor(team);
   const form = await teamRepository.recentForm(team, 5);
   const upcoming = await teamRepository.upcomingFixtures(team, todayISO(), 5);
@@ -109,7 +110,7 @@ export async function renderTeamOverview({ team }) {
 }
 
 export async function renderTeamFixtures({ team, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const stats = await teamRepository.statsFor(team);
   const page = Number(query.page || 1);
   const { rows, total, totalPages } = await teamRepository.fixturesPage(team, todayISO(), { page, pageSize: 20 });
@@ -143,7 +144,7 @@ export async function renderTeamFixtures({ team, query }) {
 }
 
 export async function renderTeamResults({ team, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const stats = await teamRepository.statsFor(team);
   const page = Number(query.page || 1);
   const season = query.season || null;
@@ -201,7 +202,7 @@ export async function renderTeamResults({ team, query }) {
 }
 
 export async function renderTeamStatistics({ team }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const history = await teamRepository.seasonHistory(team);
   const stats = history[0] || null;
   if (!stats) {
@@ -242,7 +243,7 @@ export async function renderTeamStatistics({ team }) {
 }
 
 export async function renderTeamSquad({ team }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const stats = await teamRepository.statsFor(team);
   const squad = await teamRepository.squad(team, stats?.season);
 
@@ -272,7 +273,7 @@ export async function renderTeamSquad({ team }) {
 }
 
 export async function renderTeamPredictions({ team, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const stats = await teamRepository.statsFor(team);
   const page = Number(query.page || 1);
   const { rows, total, totalPages } = await teamRepository.predictionsFor(team, { page, pageSize: 20 });
@@ -311,7 +312,7 @@ export async function renderTeamPredictions({ team, query }) {
 }
 
 export async function renderTeamOdds({ team, query }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const stats = await teamRepository.statsFor(team);
   const page = Number(query.page || 1);
   const { rows, total, totalPages } = await teamRepository.oddsFor(team, { page, pageSize: 20 });
@@ -345,7 +346,7 @@ export async function renderTeamOdds({ team, query }) {
 }
 
 export async function renderTeamHistory({ team }) {
-  if (!storage.ready) return notLoaded();
+  if (!db.ready) return notLoaded();
   const history = await teamRepository.seasonHistory(team);
 
   const body = `

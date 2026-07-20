@@ -88,7 +88,7 @@ async function renderOverview(user, isAdmin) {
       console.warn('Admin overview failed to load some cloud data', e);
     }
   } else {
-    if (storage.ready) {
+    if (db.ready) {
       const allTables = storage.all("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
       tableStats = allTables.map(({ name }) => {
         try { return { name, count: storage.all(`SELECT COUNT(*) AS n FROM "${name}"`)[0]?.n ?? 0 }; }

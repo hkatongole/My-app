@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 import { predictionRepository  } from '../db/repositories.js';
 import { lineChart } from '../components/chart.js';
 import { formatPct } from '../components/format.js';
@@ -17,7 +18,7 @@ const ENGINE_COLORS = {
 };
 
 export async function renderModelPerformance({ query }) {
-  if (!storage.ready) {
+  if (!db.ready) {
     return `<div class="empty-state"><h2>No database loaded</h2><p>Import a .sqlite backup from the Home page first.</p></div>`;
   }
 

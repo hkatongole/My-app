@@ -1,3 +1,4 @@
+import { db } from '../db/dbProvider.js';
 /**
  * renderHowItWorks — Section 4 item 10
  *
@@ -13,7 +14,7 @@ import { formatPct } from '../components/format.js';
 export async function renderHowItWorks() {
   // Engine weights — shown live if available, gracefully omitted if not
   let weightsSection = '';
-  if (storage.ready && storage.hasTable('engine_weights')) {
+  if (db.ready && storage.hasTable('engine_weights')) {
     const latest = storage.get(
       `SELECT * FROM engine_weights ORDER BY computed_at DESC LIMIT 1`
     );
