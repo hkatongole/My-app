@@ -250,25 +250,12 @@ class CloudTeamRepository {
     if (league) conditions.push({ col: 'league', op: 'eq', val: league });
     if (effectiveSeason) conditions.push({ col: 'season', op: 'eq', val: effectiveSeason });
 
-    if (db.rowCount('team_stats') > 0) {
-      return db.query('team_stats', {
-        select: ['team','league','season','points','wins','draws','losses','games_played','win_rate'],
-        conditions,
-        order: 'league.asc,points.desc',
-        limit: 2000,
-      });
-    }
-    // Fallback: derive from matches
-    const matches = await db.query('matches', { select: ['home_team','away_team','league'], limit: 5000 });
-    const seen = new Map();
-    for (const m of matches) {
-      for (const team of [m.home_team, m.away_team]) {
-        if (team && !seen.has(`${team}|${m.league}`)) {
-          seen.set(`${team}|${m.league}`, { team, league: m.league, season: null, points: null });
-        }
-      }
-    }
-    return [...seen.values()];
+    return db.query('team_stats', {
+      select: ['team','league','season','points','wins','draws','losses','games_played','win_rate'],
+      conditions,
+      order: 'league.asc,points.desc',
+      limit: 2000,
+    });
   }
 
   async statsFor(team, season = null) {
