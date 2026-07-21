@@ -39,23 +39,13 @@ async function paginate(table, {
 // ---------------------------------------------------------------------------
 class CloudMatchRepository {
   async listLeagues() {
-    const rows = await db.query('matches', {
-      select: ['league'],
-      conditions: [{ col: 'league', op: 'not.is', val: 'null' }],
-      order: 'league.asc',
-    });
-    // Deduplicate (PostgREST doesn't do DISTINCT natively on single columns without RPC)
-    return [...new Set(rows.map((r) => r.league))];
+    const rows = await db.rpc('get_distinct_leagues');
+    return rows || [];
   }
 
   async listSeasons(league = null) {
-    const conditions = league ? [{ col: 'league', op: 'eq', val: league }] : [];
-    const rows = await db.query('matches', {
-      select: ['season'],
-      conditions,
-      order: 'season.desc',
-    });
-    return [...new Set(rows.map((r) => r.season).filter(Boolean))];
+    const rows = await db.rpc('get_distinct_seasons', { p_league: league ?? null });
+    return rows || [];
   }
 
   async fixturesForDate(dateStr, { league = null } = {}) {
