@@ -1,4 +1,4 @@
-const CACHE_NAME = 'plusone-shell-v2';
+const CACHE_NAME = 'plusone-shell-v3';
 const SHELL_ASSETS = [
   './',
   './index.html',
