@@ -142,10 +142,13 @@ async function _rpc(fnName, params = {}) {
  */
 function _buildFilter(conditions = []) {
   return conditions.map(({ col, op, val }) => {
+    if (col === 'or')  return `or=${encodeURIComponent(val)}`;
+    if (col === 'and') return `and=${encodeURIComponent(val)}`;
     if (op === 'in') return `${col}=in.(${val.join(',')})`;
     if (op === 'like') return `${col}=like.*${val}*`;
     if (op === 'ilike') return `${col}=ilike.*${val}*`;
     if (op === 'is') return `${col}=is.${val}`;
+    if (op === 'not.is') return `${col}=not.is.${val}`;
     return `${col}=${op}.${encodeURIComponent(val)}`;
   }).join('&');
 }
