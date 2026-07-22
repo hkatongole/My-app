@@ -8,16 +8,14 @@ import { db } from '../db/dbProvider.js';
  * Pulls live engine weight history from the loaded DB so readers see real
  * current blend weights, not just a hand-written description.
  */
-import { storage } from '../db/storageAdapter.js';
 import { formatPct } from '../components/format.js';
 
 export async function renderHowItWorks() {
   // Engine weights — shown live if available, gracefully omitted if not
   let weightsSection = '';
-  if (db.ready && storage.hasTable('engine_weights')) {
-    const latest = storage.get(
-      `SELECT * FROM engine_weights ORDER BY computed_at DESC LIMIT 1`
-    );
+  if (db.ready) {
+    const _ew = await db.query('engine_weights', { order: 'computed_at.desc', limit: 1 });
+    const latest = (_ew && _ew.length > 0) ? _ew[0] : null;
     if (latest) {
       const dc  = formatPct(latest.dc_weight);
       const ml  = formatPct(latest.ml_weight);
