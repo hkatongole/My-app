@@ -806,3 +806,213 @@ GRANT EXECUTE ON FUNCTION get_prediction_distribution TO anon;
 GRANT EXECUTE ON FUNCTION get_max_value_gap         TO anon;
 GRANT EXECUTE ON FUNCTION get_fixtures_for_date     TO anon;
 GRANT EXECUTE ON FUNCTION get_next_fixture_date     TO anon;
+
+-- ============================================================
+-- ADDITIONAL RPC FUNCTIONS (added post-initial-schema)
+-- ============================================================
+
+-- League directory — list all leagues with fixture/team/prediction counts
+CREATE OR REPLACE FUNCTION get_league_directory()
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  WITH latest_seasons AS (
+    SELECT league, MAX(season) AS season
+    FROM matches
+    WHERE league IS NOT NULL
+    GROUP BY league
+  ),
+  fixture_counts AS (
+    SELECT m.league, m.season, COUNT(*) AS cnt
+    FROM matches m
+    JOIN latest_seasons ls ON m.league = ls.league AND m.season = ls.season
+    GROUP BY m.league, m.season
+  ),
+  team_counts AS (
+    SELECT ts.league, ts.season, COUNT(DISTINCT ts.team) AS cnt
+    FROM team_stats ts
+    JOIN latest_seasons ls ON ts.league = ls.league AND ts.season = ls.season
+    GROUP BY ts.league, ts.season
+  ),
+  pred_counts AS (
+    SELECT league, COUNT(*) AS cnt
+    FROM prediction_log
+    GROUP BY league
+  )
+  SELECT json_agg(row_to_json(q)) FROM (
+    SELECT
+      ls.league,
+      ls.season,
+      COALESCE(fc.cnt, 0) AS "fixtureCount",
+      COALESCE(tc.cnt, 0) AS "teamCount",
+      COALESCE(pc.cnt, 0) AS "predictionCount"
+    FROM latest_seasons ls
+    LEFT JOIN fixture_counts fc ON fc.league = ls.league
+    LEFT JOIN team_counts tc ON tc.league = ls.league
+    LEFT JOIN pred_counts pc ON pc.league = ls.league
+    ORDER BY ls.league
+  ) q;
+$$;
+
+-- Distinct leagues list
+CREATE OR REPLACE FUNCTION get_distinct_leagues()
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  SELECT json_agg(league ORDER BY league)
+  FROM (SELECT DISTINCT league FROM matches WHERE league IS NOT NULL) q;
+$$;
+
+-- Distinct seasons list (optional league filter)
+CREATE OR REPLACE FUNCTION get_distinct_seasons(p_league TEXT DEFAULT NULL)
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  SELECT json_agg(season ORDER BY season DESC)
+  FROM (
+    SELECT DISTINCT season FROM matches
+    WHERE league IS NOT NULL
+    AND (p_league IS NULL OR league = p_league)
+  ) q;
+$$;
+
+-- Fixed get_league_standings (position is reserved word — use pos alias)
+CREATE OR REPLACE FUNCTION get_league_standings(p_league TEXT, p_season TEXT)
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  SELECT json_agg(row_to_json(q)) FROM (
+    SELECT
+      ts.team,
+      ts.points,
+      ts.games_played,
+      ts.wins,
+      ts.draws,
+      ts.losses,
+      ts.goals_scored,
+      ts.goals_conceded,
+      (ts.goals_scored - ts.goals_conceded) AS goal_diff,
+      ROW_NUMBER() OVER (ORDER BY ts.points DESC, (ts.goals_scored - ts.goals_conceded) DESC, ts.goals_scored DESC) AS pos
+    FROM team_stats ts
+    WHERE ts.league = p_league AND ts.season = p_season
+    ORDER BY ts.points DESC, (ts.goals_scored - ts.goals_conceded) DESC, ts.goals_scored DESC
+  ) q;
+$$;
+
+-- Grant execute on new functions
+GRANT EXECUTE ON FUNCTION get_league_directory()               TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_distinct_leagues()               TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_distinct_seasons(TEXT)           TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_league_standings(TEXT, TEXT)     TO anon, authenticated;
+
+-- ============================================================
+-- MISSING RLS POLICIES (added post-initial-schema)
+-- ============================================================
+
+CREATE POLICY "anon_read_league_mappings"      ON league_mappings      FOR SELECT USING (true);
+CREATE POLICY "anon_read_live_standings"       ON live_standings       FOR SELECT USING (true);
+CREATE POLICY "anon_read_live_standings_rows"  ON live_standings_rows  FOR SELECT USING (true);
+CREATE POLICY "anon_read_live_h2h_matches"     ON live_h2h_matches     FOR SELECT USING (true);
+CREATE POLICY "anon_read_match_referees"       ON match_referees       FOR SELECT USING (true);
+CREATE POLICY "anon_read_match_weather"        ON match_weather        FOR SELECT USING (true);
+CREATE POLICY "anon_read_team_lineups"         ON team_lineups         FOR SELECT USING (true);
+CREATE POLICY "anon_read_understat_team_stats" ON understat_team_stats FOR SELECT USING (true);
+CREATE POLICY "anon_read_scraper_health"       ON scraper_health       FOR SELECT USING (true);
+CREATE POLICY "anon_read_clubelo_fixtures"     ON clubelo_fixtures     FOR SELECT USING (true);
+
+-- ============================================================
+-- ADDITIONAL RPC FUNCTIONS (added post-initial-schema)
+-- ============================================================
+
+-- League directory — list all leagues with fixture/team/prediction counts
+CREATE OR REPLACE FUNCTION get_league_directory()
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  WITH latest_seasons AS (
+    SELECT league, MAX(season) AS season
+    FROM matches
+    WHERE league IS NOT NULL
+    GROUP BY league
+  ),
+  fixture_counts AS (
+    SELECT m.league, m.season, COUNT(*) AS cnt
+    FROM matches m
+    JOIN latest_seasons ls ON m.league = ls.league AND m.season = ls.season
+    GROUP BY m.league, m.season
+  ),
+  team_counts AS (
+    SELECT ts.league, ts.season, COUNT(DISTINCT ts.team) AS cnt
+    FROM team_stats ts
+    JOIN latest_seasons ls ON ts.league = ls.league AND ts.season = ls.season
+    GROUP BY ts.league, ts.season
+  ),
+  pred_counts AS (
+    SELECT league, COUNT(*) AS cnt
+    FROM prediction_log
+    GROUP BY league
+  )
+  SELECT json_agg(row_to_json(q)) FROM (
+    SELECT
+      ls.league,
+      ls.season,
+      COALESCE(fc.cnt, 0) AS "fixtureCount",
+      COALESCE(tc.cnt, 0) AS "teamCount",
+      COALESCE(pc.cnt, 0) AS "predictionCount"
+    FROM latest_seasons ls
+    LEFT JOIN fixture_counts fc ON fc.league = ls.league
+    LEFT JOIN team_counts tc ON tc.league = ls.league
+    LEFT JOIN pred_counts pc ON pc.league = ls.league
+    ORDER BY ls.league
+  ) q;
+$$;
+
+-- Distinct leagues list
+CREATE OR REPLACE FUNCTION get_distinct_leagues()
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  SELECT json_agg(league ORDER BY league)
+  FROM (SELECT DISTINCT league FROM matches WHERE league IS NOT NULL) q;
+$$;
+
+-- Distinct seasons list (optional league filter)
+CREATE OR REPLACE FUNCTION get_distinct_seasons(p_league TEXT DEFAULT NULL)
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  SELECT json_agg(season ORDER BY season DESC)
+  FROM (
+    SELECT DISTINCT season FROM matches
+    WHERE league IS NOT NULL
+    AND (p_league IS NULL OR league = p_league)
+  ) q;
+$$;
+
+-- Fixed get_league_standings (position is reserved word — use pos alias)
+CREATE OR REPLACE FUNCTION get_league_standings(p_league TEXT, p_season TEXT)
+RETURNS JSON LANGUAGE SQL STABLE AS $$
+  SELECT json_agg(row_to_json(q)) FROM (
+    SELECT
+      ts.team,
+      ts.points,
+      ts.games_played,
+      ts.wins,
+      ts.draws,
+      ts.losses,
+      ts.goals_scored,
+      ts.goals_conceded,
+      (ts.goals_scored - ts.goals_conceded) AS goal_diff,
+      ROW_NUMBER() OVER (ORDER BY ts.points DESC, (ts.goals_scored - ts.goals_conceded) DESC, ts.goals_scored DESC) AS pos
+    FROM team_stats ts
+    WHERE ts.league = p_league AND ts.season = p_season
+    ORDER BY ts.points DESC, (ts.goals_scored - ts.goals_conceded) DESC, ts.goals_scored DESC
+  ) q;
+$$;
+
+-- Grant execute on new functions
+GRANT EXECUTE ON FUNCTION get_league_directory()               TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_distinct_leagues()               TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_distinct_seasons(TEXT)           TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_league_standings(TEXT, TEXT)     TO anon, authenticated;
+
+-- ============================================================
+-- MISSING RLS POLICIES (added post-initial-schema)
+-- ============================================================
+
+CREATE POLICY "anon_read_league_mappings"      ON league_mappings      FOR SELECT USING (true);
+CREATE POLICY "anon_read_live_standings"       ON live_standings       FOR SELECT USING (true);
+CREATE POLICY "anon_read_live_standings_rows"  ON live_standings_rows  FOR SELECT USING (true);
+CREATE POLICY "anon_read_live_h2h_matches"     ON live_h2h_matches     FOR SELECT USING (true);
+CREATE POLICY "anon_read_match_referees"       ON match_referees       FOR SELECT USING (true);
+CREATE POLICY "anon_read_match_weather"        ON match_weather        FOR SELECT USING (true);
+CREATE POLICY "anon_read_team_lineups"         ON team_lineups         FOR SELECT USING (true);
+CREATE POLICY "anon_read_understat_team_stats" ON understat_team_stats FOR SELECT USING (true);
+CREATE POLICY "anon_read_scraper_health"       ON scraper_health       FOR SELECT USING (true);
+CREATE POLICY "anon_read_clubelo_fixtures"     ON clubelo_fixtures     FOR SELECT USING (true);
